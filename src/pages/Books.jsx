@@ -5,7 +5,8 @@ const Books = () => {
   
    return (
     <PagesLayout>
-    <h1>Books</h1>
+    <div>Books</div>
+    
    </PagesLayout>
    );
    
