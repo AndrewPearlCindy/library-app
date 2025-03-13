@@ -209,7 +209,7 @@ const Landing = () => {
           <div className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col">
             <div className="p-6">
               <div className="flex items-center gap-2 mb-8">
-                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center bg-[img">
                   <span className="text-white font-bold">D</span>
                 </div>
                 <span className="text-lg font-semibold">Discover</span>
