@@ -1,109 +1,194 @@
 import React from "react";
-import { FaStar, FaStarHalfAlt, FaRegStar, FaHeart, FaEdit, FaTrash } from "react-icons/fa";
+import { FaDownload, FaEdit, FaTrash, FaHeart } from "react-icons/fa";
 
-const BookDetailPage = () => {
-  const book = {
-    title: "Thinking about water",
-    author: "Niraj Bhattarai",
-    rating: 4.2,
-    availableCopies: 6,
-    synopsis:
-      "Synopsis\n\nExamine a Resource | River Calling | Poem\n\nDuring the 1980s and 90s, the Resource Institute, headed by Jonathan White, held a series of 'Floating Seminars' aboard a sixty-five-foot schooner featuring leading writers...",
+const BookDetails = ({ book }) => {
+  const apiUrl = "https://library-system-api-o8rl.onrender.com/api/v1/books";
+
+  const handleSave = async () => {
+    try {
+      // Assuming you want to save the book details
+      const response = await fetch(`${apiUrl}/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(book), // Sending the book data
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save the book');
+      }
+
+      const result = await response.json();
+      console.log("Book saved successfully:", result);
+      // Provide feedback to the user if needed
+    } catch (error) {
+      console.error("Error saving the book:", error);
+      alert("An error occurred while saving the book. Please try again.");
+    }
   };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating - fullStars >= 0.5;
+  // Check if book is defined and has an image property
+  const imageUrl =
+    book && book.image
+      ? `https://savefiles.org/secure/uploads/${book.image}?shareable_link=636`
+      : "/api/placeholder/240/360"; // Fallback image
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
+  // Handle editing a book
+  const handleEdit = async () => {
+    const editedBook = {
+      title: book.title,
+      author: book.author,
+      publishedYear: book.publishedYear,
+      genre: book.genre,
+      description: book.description,
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/${book.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editedBook),
+      });
+
+      if (response.ok) {
+        alert("Book updated successfully!");
+      } else {
+        alert("Failed to update book. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating book:", error);
+      alert("An error occurred while updating the book.");
     }
+  };
 
-    if (hasHalfStar) {
-      stars.push(<FaStarHalfAlt key="half" className="text-yellow-400" />);
+  // Handle deleting a book
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this book?"
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await fetch(`${apiUrl}/${book.id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          alert("Book deleted successfully!");
+          // Optionally handle UI updates, e.g., redirect or remove the book from the displayed list
+        } else if (response.status === 404) {
+          alert("Book not found. It may have already been deleted.");
+        } else {
+          alert("An error occurred while deleting the book. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error deleting book:", error);
+        alert("An error occurred while deleting the book.");
+      }
     }
-
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaRegStar key={`empty-${i}`} className="text-yellow-400" />);
-    }
-
-    return stars;
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-xl my-8 border border-gray-100">
-      {/* Book Header with Gradient Background */}
-      <div className="relative">
-        <div className="h-72 bg-gradient-to-br from-blue-400 to-purple-500">
-          <div className="absolute inset-0 bg-grey-300 bg-opacity-20"></div>
-          
-          {/* Floating Book Cover */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative">
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl overflow-hidden shadow-xl my-8 border border-gray-100">
+      <div className="md:flex">
+        {/* Book Image Section */}
+        <div className="md:w-1/3 bg-gradient-to-br from-amber-50 to-amber-100">
+          <div className="h-full flex items-center justify-center p-8">
+            <div className="relative group">
               <img
-                src="/api/placeholder/160/240"
-                alt="Book cover for Thinking about water"
-                className="h-56 rounded shadow-2xl transform transition-all duration-300 hover:scale-105"
+                src={imageUrl} // Use the constructed image URL
+                alt={book ? book.title : "Book Image"} // Provide alt text safely
+                className="rounded-lg shadow-lg transform transition-all duration-300 group-hover:scale-105 w-full h-auto md:h-full object-cover"
               />
-              {/* Book Rating Badge */}
-              <div className="absolute -right-4 -bottom-4 bg-white px-3 py-1 rounded-full shadow-lg flex items-center space-x-1">
-                <div className="flex items-center text-sm">{renderStars(book.rating)}</div>
-                <span className="font-bold text-gray-700">{book.rating}</span>
+              <div className="absolute top-2 right-2 bg-amber-100 px-3 py-1 rounded-full text-amber-800 text-xs font-medium">
+                {book ? book.publishedYear : "N/A"}{" "}
+                {/* Safe access to publishedYear */}
               </div>
             </div>
-          </div>
-          
-          {/* Book Title Overlay - Positioned at Bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent text-white">
-            <h2 className="text-2xl font-bold">{book.title}</h2>
-            <p className="text-sm opacity-90">By {book.author}</p>
           </div>
         </div>
 
         {/* Book Details Section */}
-        <div className="p-6 bg-white">
-          {/* Availability Badge */}
-          <div className="flex justify-between items-center mb-6">
-            <span className="text-xs font-medium bg-green-100 text-green-800 py-1 px-3 rounded-full">
-              {book.availableCopies} {book.availableCopies === 1 ? 'Copy' : 'Copies'} Available
-            </span>
-            
-            {/* Action Buttons */}
-            <div className="flex space-x-3">
-              <button className="w-10 h-10 flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-colors duration-200">
-                <FaEdit className="text-lg" />
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-full transition-colors duration-200">
-                <FaTrash className="text-lg" />
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-600 rounded-full transition-colors duration-200">
-                <FaHeart className="text-lg" />
-              </button>
+        <div className="md:w-2/3 p-8 flex flex-col">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              {book ? book.title : "Title Not Available"}
+            </h1>
+            <div className="flex items-center text-gray-600 mb-6">
+              <span className="text-sm mr-4">
+                {book && book.author && book.author !== "NA"
+                  ? `By ${book.author}`
+                  : "Author Not Specified"}
+              </span>
+              <span className="text-sm bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
+                {book && book.genre ? book.genre : "Genre Not Specified"}
+              </span>
             </div>
           </div>
 
-          {/* Synopsis Section */}
+          {/* Book description */}
           <div className="mb-6">
-            <h3 className="font-bold text-gray-800 mb-3 text-lg border-b border-gray-200 pb-2">Synopsis</h3>
-            <div className="text-sm text-gray-600 space-y-2">
-              <p>
-                During the 1980s and 90s, the Resource Institute, headed by
-                Jonathan White, held a series of 'Floating Seminars' aboard a
-                sixty-five-foot schooner featuring leading writers...
-              </p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">
+              About this book
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              {book && book.description
+                ? book.description
+                : "Description not available."}
+            </p>
+          </div>
+
+          {/* Historical context */}
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">
+              Historical Context
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              First published in{" "}
+              {book && book.publishedYear
+                ? book.publishedYear
+                : "Year not available"}
+              , this text has historical significance as one of the foundational
+              works of the Latter Day Saint movement. It continues to be a
+              central religious text for millions of followers worldwide.
+            </p>
+          </div>
+
+          {/* Action buttons  */}
+          <div className="mt-auto pt-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition-colors duration-200 mb-4 md:mb-0" // Added margin for mobile
+              >
+                <FaDownload /> Save
+              </button>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleEdit}
+                  className="w-10 h-10 flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-colors duration-200"
+                  title="Edit"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-full transition-colors duration-200"
+                  title="Delete"
+                >
+                  <FaTrash />
+                </button>
+              </div>
             </div>
           </div>
-          
-          {/* CTA Button */}
-          <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium shadow-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 mt-2">
-            Borrow This Book
-          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default BookDetailPage;
+export default BookDetails;
