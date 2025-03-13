@@ -14,7 +14,11 @@ function App() {
         <Route path="/books" element={<Books />} />
         <Route path="/single-book" element={<SingleBook />} />
         <Route path="/add-book" element={<AddBook />} />
-        {/* <Route path="/navbar" element={<NavBar />} /> */}
+//           feature/add-book
+        <Route path="/NavBar" element={<NavBar />} />
+        <Route path="/" element={<NavBar />} />
+
+        {/* <Route path="/navbar" element={<NavBar />} /> */
       </Routes>
     </BrowserRouter>
   );
