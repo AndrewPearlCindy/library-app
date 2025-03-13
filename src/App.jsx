@@ -16,6 +16,7 @@ function App() {
         <Route path="/single-book" element={<SingleBook />} />
         <Route path="/add-book" element={<AddBook />} />
         <Route path="/NavBar" element={<NavBar />} />
+        <Route path="/" element={<NavBar />} />
       </Routes>
     </BrowserRouter>
   );
