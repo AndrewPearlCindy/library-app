@@ -1,5 +1,8 @@
 import React from "react";
 import { FaDownload, FaEdit, FaTrash, FaHeart } from "react-icons/fa";
+// import Landing from "./pages/Landing";
+// import MyLibrary from './MyLibrary'; // Example: My Library component
+// import GenresPage from './GenresPage'; // Example: Genres page component
 
 const BookDetails = ({ book }) => {
   const apiUrl = "https://library-system-api-o8rl.onrender.com/api/v1/books";
