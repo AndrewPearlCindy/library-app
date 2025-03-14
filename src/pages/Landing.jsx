@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PagesLayout from "../layouts/PagesLayout";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import {
   FiGrid,
@@ -362,7 +362,7 @@ const Landing = () => {
                           e.target.src = "/images/placeholder-book.jpg";
                         }}
                       />
-                      <div className="p-3" onClick={SingleBook}>
+                      <div className="p-3">
                         <h3 className="font-medium text-sm truncate">
                           {book.title}
                         </h3>
